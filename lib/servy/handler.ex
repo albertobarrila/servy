@@ -5,8 +5,22 @@ defmodule Servy.Handler do
     |> rewrite_path
     |> log
     |> route
+    |> emojify
     |> track
     |> format_response
+  end
+
+  def emojify(%{status: 200} = conv) do
+    emojies = String.duplicate("🎉", 5)
+    body = emojies <> "\n" <> conv.resp_body <> "\n" <> emojies
+
+    %{ conv | resp_body: body }
+  end
+
+  def emojify(conv), do: conv
+
+  def rewrite_path(%{path: "/bears?id=" <> id} = conv) do
+    %{ conv | path: "/bears/#{id}" }
   end
 
   def track(%{status: 404, path: path} = conv) do
@@ -128,6 +142,16 @@ IO.puts(Servy.Handler.handle(request))
 
 request = """
 DELETE /bears/1 HTTP/1.1
+Host: example.com
+User-Agent: ExampleBrowser/1.0
+Accept: */*
+
+"""
+
+IO.puts(Servy.Handler.handle(request))
+
+request = """
+GET /bears?id=1 HTTP/1.1
 Host: example.com
 User-Agent: ExampleBrowser/1.0
 Accept: */*
