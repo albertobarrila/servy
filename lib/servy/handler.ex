@@ -2,9 +2,12 @@ defmodule Servy.Handler do
   def handle(request) do
     request
     |> parse
+    |> log
     |> route
     |> format_response
   end
+
+  def log(conv), do: IO.inspect conv
 
   def parse(request) do
     [method, path, _] =
@@ -17,8 +20,15 @@ defmodule Servy.Handler do
   end
 
   def route(conv) do
-    # TODO: Create a new map that also has the response body:
+    route(conv, conv[:method], conv[:path])
+  end
+
+  def route(conv, "GET", "/wildthings") do
     %{conv | resp_body: "Bears, Lions, Tigers"}
+  end
+
+  def route(conv, "GET", "/bears") do
+    %{conv | resp_body: "Teddy, Smokey, Paddington"}
   end
 
   def format_response(conv) do
@@ -34,6 +44,16 @@ end
 
 request = """
 GET /wildthings HTTP/1.1
+Host: example.com
+User-Agent: ExampleBrowser/1.0
+Accept: */*
+
+"""
+
+IO.puts(Servy.Handler.handle(request))
+
+request = """
+GET /bears HTTP/1.1
 Host: example.com
 User-Agent: ExampleBrowser/1.0
 Accept: */*
