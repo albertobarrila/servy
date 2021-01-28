@@ -5,6 +5,8 @@ defmodule Servy.Handler do
   """
   @pages_path Path.expand("../../pages", __DIR__)
 
+  import Servy.Plugins, only: [rewrite_path: 1, log: 1, emojify: 1, track: 1]
+  import Servy.Parser, only: [parse: 1]
   @doc """
     transform the request intoa response
   """
@@ -19,43 +21,7 @@ defmodule Servy.Handler do
     |> format_response
   end
 
-  def emojify(%{status: 200} = conv) do
-    emojies = String.duplicate("🎉", 5)
-    body = emojies <> "\n" <> conv.resp_body <> "\n" <> emojies
 
-    %{conv | resp_body: body}
-  end
-
-  def emojify(conv), do: conv
-
-  def track(%{status: 404, path: path} = conv) do
-    IO.puts("Warning: #{path} is on the loose!")
-    conv
-  end
-
-  def track(conv), do: conv
-
-  def rewrite_path(%{path: "/bears?id=" <> id} = conv) do
-    %{conv | path: "/bears/#{id}"}
-  end
-
-  def rewrite_path(%{path: "/wildlife"} = conv) do
-    %{conv | path: "/wildthings"}
-  end
-
-  def rewrite_path(conv), do: conv
-
-  def log(conv), do: IO.inspect(conv)
-
-  def parse(request) do
-    [method, path, _] =
-      request
-      |> String.split("\n")
-      |> List.first()
-      |> String.split(" ")
-
-    %{method: method, path: path, resp_body: "", status: nil}
-  end
 
   def route(%{method: "GET", path: "/wildthings"} = conv) do
     %{conv | status: 200, resp_body: "Bears, Lions, Tigers"}
