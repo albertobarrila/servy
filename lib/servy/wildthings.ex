@@ -1,4 +1,8 @@
 defmodule Servy.Wildthings do
+  @moduledoc """
+    Wildthings repository
+  """
+
   alias Servy.Bear
 
   def list_bears do

@@ -1,4 +1,7 @@
 defmodule Servy.Plugins do
+  @moduledoc """
+    plugings for servy
+  """
 
   alias Servy.Conv
 
@@ -28,5 +31,5 @@ defmodule Servy.Plugins do
 
   def rewrite_path(%Conv{} = conv), do: conv
 
-  def log(%Conv{} = conv), do: IO.inspect(conv)
+  def log(%Conv{} = conv), do: IO.puts(conv)
 end
